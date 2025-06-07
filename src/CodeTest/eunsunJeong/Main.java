@@ -1,4 +1,4 @@
-package codetest.eunsunjeong;
+package CodeTest.eunsunJeong;
 
 import java.util.Scanner;
 
