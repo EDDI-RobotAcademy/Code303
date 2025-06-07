@@ -27,3 +27,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# === Only track my folder ===
+*
+!src/CodeTest/eunsunJeong/
+!src/CodeTest/eunsunJeong/**
