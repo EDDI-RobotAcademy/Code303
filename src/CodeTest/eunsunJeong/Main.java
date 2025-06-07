@@ -18,38 +18,48 @@ public class Main {
 		System.out.println("======================");
 		System.out.println("1번 플레이어 [" + player1 + "]님의 결과");
 		diceRoll();
-		System.out.println("1번 플레이어 [" + player2 + "]님의 결과");
+		System.out.println();
+		
+		System.out.println("2번 플레이어 [" + player2 + "]님의 결과");
 		diceRoll();
 		System.out.println("======================");
 	}
 	
-	//주사위 3개 굴리기
+	//주사위 2개 굴리기
 	public static void diceRoll() {
+		int[] dice = new int[2];
+		
 		System.out.println("1번 주사위를 굴립니다.");
-		int dice1 = (int)(Math.random() * 6) + 1;
-		System.out.println("결과 : " + dice1);
+		dice[0] = (int)(Math.random() * 6) + 1;
+		System.out.println("결과 : " + dice[0]);
 		
 		System.out.println("2번 주사위를 굴립니다.");
-		int dice2 = (int)(Math.random() * 6) + 1;
-		System.out.println("결과 : " + dice2);
+		dice[1] = (int)(Math.random() * 6) + 1;
+		System.out.println("결과 : " + dice[1]);
 		
+		if(dice[0] % 2 == 0) {
+			System.out.println("스킬 발동!");
+			int dice3 = diceSkill();
+		}
+	}
+	
+	//3번 주사위 스킬 발동하기(3번, 4번 구현하기)
+	public static int diceSkill() {
 		System.out.println("3번 주사위를 굴립니다.");
 		int dice3 = (int)(Math.random() * 6) + 1;
 		System.out.println("결과 : " + dice3);
 		
-		int reuslt = diceSkill(dice1, dice2, dice3);
-	}
-	
-	//3번 주사위 스킬 발동하기(3번, 4번 구현하기)
-	public static int diceSkill(int dice1, int dice2, int dice3) {
 		if(dice3 == 3) {
+			//상대방의 점수를 빼앗으려면 상대방의 점수를 가져와야 하는데
 			System.out.println("상대방의 점수를 빼앗습니다.");
 			return 0;
-		} else if(dice3 == 4) {
-			System.out.println("자신이 즉사합니다.");
+		}else if(dice3 == 4) {
+			//바로 게임 종료? status 0으로 설정해서? 그러면 status를 전역변수로 선언해야 하나?
+			System.out.println("즉사합니다.");
 			return 0;
-		} else {
-			return dice1 + dice2 + dice3;
+		}else {
+			System.out.println("1, 2, 3번 주사위를 합산합니다.");
+			return dice3;
 		}
 	}
 	
@@ -76,6 +86,7 @@ public class Main {
 			}
 			
 			if(status == 2) {
+				//기록 열람을 위한 변수 선언 및 메소드 필요
 				System.out.println("기록을 열람합니다.");
 			}
 		}
