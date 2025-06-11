@@ -5,12 +5,11 @@ out/
 
 ### Eclipse ###
 .apt_generated
-.classpath
 .factorypath
-.project
 .settings
 .springBeans
 .sts4-cache
+.metadata/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
@@ -27,3 +26,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# === Only track eunsunJeong folder and its contents ===
+*
+!src/
+!src/CodeTest/
+!src/CodeTest/eunsunJeong/
+!src/CodeTest/eunsunJeong/**
