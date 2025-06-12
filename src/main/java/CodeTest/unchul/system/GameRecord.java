@@ -1,4 +1,4 @@
-package unchul.system;
+package CodeTest.unchul.system;
 
 public class GameRecord {
     private int[] diceRolls;

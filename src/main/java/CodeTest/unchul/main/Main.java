@@ -1,4 +1,4 @@
-package unchul.main;
+package CodeTest.unchul.main;
 
 import unchul.system.DiceGame;
 

@@ -1,4 +1,4 @@
-package CodeTest.eunsunJeong.account.service;
+package Account.service;
 
 public interface AccountService {
 	int register();

@@ -1,4 +1,4 @@
-package CodeTest.eunsunJeong.account.repository;
+package Account.repository;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import CodeTest.eunsunJeong.account.entity.Account;
+import Account.entity.Account;
 
 public class AccountRepositoryImpl implements AccountRepository{
 	private static AccountRepositoryImpl instance;

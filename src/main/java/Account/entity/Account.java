@@ -1,4 +1,4 @@
-package CodeTest.eunsunJeong.account.entity;
+package Account.entity;
 
 public class Account {
 	private static long idCounter = 1;

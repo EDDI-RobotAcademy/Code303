@@ -1,8 +1,8 @@
-package CodeTest.eunsunJeong.account.repository;
+package Account.repository;
 
 import java.util.Optional;
 
-import CodeTest.eunsunJeong.account.entity.Account;
+import Account.entity.Account;
 
 public interface AccountRepository {
 	int save(Account accouunt);
