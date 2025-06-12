@@ -1,5 +1,12 @@
 # Gradle 프로젝트 Import 가이드
 
+> ⚙️ **본 프로젝트는 아래 환경에서 빌드되었습니다.**
+
+- **Gradle Kotlin DSL**: `Gradle 8.13`
+- **JDK**: `Oracle OpenJDK 23.0.2 (openjdk-23)`
+
+---
+
 ## ✅ Eclipse에서 Gradle 프로젝트 Import 방법
 
 1. **File** → **Import...** 선택  
@@ -13,7 +20,7 @@
 
 - 기존 Import 방식과 동일  
 - `File` → `Open` 또는 `Import Project` 사용  
-- `build.gradle` 또는 `settings.gradle` 선택 시 자동으로 Gradle 프로젝트로 인식됨
+- `build.gradle.kts` 또는 `settings.gradle.kts` 선택 시 자동으로 Gradle 프로젝트로 인식됨
 
 ---
 
