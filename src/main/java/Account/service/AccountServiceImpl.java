@@ -1,13 +1,13 @@
-package CodeTest.eunsunJeong.account.service;
+package Account.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
 
-import CodeTest.eunsunJeong.account.entity.Account;
-import CodeTest.eunsunJeong.account.repository.AccountRepository;
-import CodeTest.eunsunJeong.account.repository.AccountRepositoryImpl;
+import Account.entity.Account;
+import Account.repository.AccountRepository;
+import Account.repository.AccountRepositoryImpl;
 
 public class AccountServiceImpl implements AccountService {
 	private static AccountServiceImpl instance;
