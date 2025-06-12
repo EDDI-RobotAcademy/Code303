@@ -1,1 +1,1 @@
-rootProject.name = "DiceRoll"
+rootProject.name = "Code303"
