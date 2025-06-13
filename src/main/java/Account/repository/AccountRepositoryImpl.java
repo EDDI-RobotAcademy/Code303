@@ -10,17 +10,17 @@ import Account.entity.Account;
 
 public class AccountRepositoryImpl implements AccountRepository{
 	private static AccountRepositoryImpl instance;
-	
+
 	private AccountRepositoryImpl() {}
-	
+
 	public static AccountRepositoryImpl getInstance() {
 		if(instance == null) {
 			instance = new AccountRepositoryImpl();
 		}
-		
+
 		return instance;
 	}
-	
+
 	private static final Map<Integer, Account> accountHashMap = new HashMap<>();
 
 	@Override
@@ -48,6 +48,6 @@ public class AccountRepositoryImpl implements AccountRepository{
 	public Optional<Account> findById(Integer id) {
 		return Optional.ofNullable(accountHashMap.get(id));
 	}
-	
-	
+
+
 }
