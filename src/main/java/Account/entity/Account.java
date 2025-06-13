@@ -2,11 +2,11 @@ package Account.entity;
 
 public class Account {
 	private static long idCounter = 1;
-	
+
 	private final long id;
 	private String userId;
 	private String password;
-	
+
 	public Account(String userId, String password) {
 		this.id = idCounter++;
 		this.userId = userId;
