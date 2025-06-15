@@ -1,55 +1,98 @@
 
+
 import java.util.Scanner;
 
 import Account.entity.Account;
+import Dice.entity.DiceRoll;
 import Dice.entity.DiceGame;
 import Dice.service.DiceService;
 import Dice.service.DiceServiceImpl;
-import Dice.entity.DiceRoll;
+
+
 
 public class Main {
-
     public static void main(String[] args) {
-
         Scanner sc = new Scanner(System.in);
+        DiceService svc = DiceServiceImpl.getInstance();
 
-        System.out.print("Player 1 이름을 입력하세요: ");
-        String name1 = sc.nextLine().trim();
-        Account player1 = new Account(name1, "");  // 비밀번호는 빈 문자열로 처리
+        // 1) 플레이어 등록
+        System.out.print("Player1 이름: ");
+        Account p1 = new Account(sc.nextLine().trim(), "");
+        System.out.print("Player2 이름: ");
+        Account p2 = new Account(sc.nextLine().trim(), "");
 
-        System.out.print("Player 2 이름을 입력하세요: ");
-        String name2 = sc.nextLine().trim();
-        Account player2 = new Account(name2, "");
-
-        //인스턴스 가져오기
-        DiceService gameService = DiceServiceImpl.getInstance();
-
-        //새로운 게임 시작
-        DiceGame game = gameService.startGame(player1, player2);
-        System.out.println("게임 #" + game.getGameId() + " 시작!");
-
-        //턴별 주사위 굴리기 반복
-        String input;
+        // 2) 게임 반복
+        String again;
         do {
-            //플레이어1 턴
-            DiceRoll roll1 = gameService.playTurn(game, player1);
-            System.out.println(player1.getUserId() + " 턴 결과: " + roll1);
+            DiceGame game = svc.startGame(p1, p2);
+            System.out.println("\n=== Game#" + game.getGameId() + " 시작 ===");
 
-            //플레이어2 턴
-            DiceRoll roll2 = gameService.playTurn(game, player2);
-            System.out.println(player2.getUserId() + " 턴 결과: " + roll2);
+            // 3) 최대 3라운드 진행
+            for (int round = 1; round <= 3; round++) {
+                System.out.println("-- 라운드 " + round + " --");
 
-            //계속 진행 여부 묻기
-            System.out.print("계속 진행하려면 [y], 종료하려면 [n]: ");
-            input = sc.nextLine().trim().toLowerCase();
-        } while ("y".equals(input));
+                DiceRoll r1 = svc.playTurn(game, p1);
+                DiceRoll r2 = svc.playTurn(game, p2);
 
-        System.out.println("\n=== 최종 게임 기록 (모든 턴) ===");
-        for (DiceRoll r : game.getRolls()) {
-            System.out.println(r);
-        }
-        
+                // 3라운드일 때만 스킬 적용
+                if (round == 3) {
+                    // 첫 라운드 주사위 값 가져오기
+                    int p1_first = game.getRolls().get(p1).get(0).getValue();
+                    int p2_first = game.getRolls().get(p2).get(0).getValue();
+                    // 두 플레이어 중 한 명이라도 첫 라운드가 짝수면 3라운드 활성화
+                    if (!(svc.isFirstDiceEven(p1_first) || svc.isFirstDiceEven(p2_first))) {
+//                        System.out.println("▶ 3라운드 스킬 조건(첫 라운드 짝수) 미충족, 스킬 비활성화.");
+                        break;  // 3라운드 종료
+                    }
+                    String result = svc.evaluateRound(game);
+                    if (!"ONGOING".equals(result)) {
+                        System.out.println("▶ 스킬 발동!");
+
+                        switch (result) {
+                            case "P1_ACTIVE3":
+                                System.out.printf("▶ %s가 특수스킬 3을 발동!%n상대 점수를 모두 훔쳐왔습니다!%n",
+                                        p1.getUserId());
+                                break;
+                            case "P2_ACTIVE3":
+                                System.out.printf("▶ %s가 특수스킬 3을 발동!%n상대 점수를 모두 훔쳐왔습니다!%n",
+                                        p2.getUserId());
+                                break;
+                            case "DRAW":
+                                System.out.println("▶ 양쪽 특수스킬 3/3을 발동!%n 무승부 처리!");
+                                break;
+                            case "BOTH_ACTIVE4":
+                                System.out.println("▶ 4/4 무승부 처리!");
+                            case "P1_ACTIVE4":
+                                System.out.printf("▶ %s가 특수스킬 4를 발동!%n%s 승리! (%s 패배)",
+                                        p1.getUserId(), p2.getUserId(),p1.getUserId() );
+                                break;
+                            case "P2_ACTIVE4":
+                                System.out.printf("▶ %s가 특수스킬 4를 발동!%n%s 승리! (%s 패배)",
+                                        p2.getUserId(), p1.getUserId(),p2.getUserId() );
+                                break;
+                        }
+                        break;
+                    }
+                }
+                System.out.printf("[%s 굴림: %d , %s 굴림: %d]%n[누적점수: %d , 누적점수: %d%n]",
+                        p1.getUserId(), r1.getValue(),p2.getUserId(), r2.getValue(),game.getTotalScore(p1) ,game.getTotalScore(p2));
+
+            }
+
+            // 4) 스킬 미발동 시 최종 점수 비교
+            int s1 = game.getTotalScore(p1), s2 = game.getTotalScore(p2);
+            if (s1 != s2) {
+                System.out.printf("▶ 최종 승리: %s%n",
+                        s1 > s2 ? p1.getUserId() : p2.getUserId());
+            } else {
+                System.out.println("▶ 최종 무승부!");
+            }
+
+            System.out.print("새 게임? (y/n): ");
+            again = sc.nextLine().trim().toLowerCase();
+        } while ("y".equals(again));
+
         sc.close();
-        System.out.println("게임 종료. 수고하셨습니다!");
+        System.out.println("게임 종료!");
     }
 }

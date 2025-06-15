@@ -13,4 +13,5 @@ public interface DiceService {
     List<DiceRoll> getAllRolls(DiceGame game);
 
 
+    String evaluateRound(DiceGame game);
 }
