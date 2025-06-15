@@ -9,6 +9,7 @@ import Dice.repository.DiceRepositoryImpl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DiceServiceImpl implements DiceService{
     private long gameCounter=1;
@@ -34,18 +35,15 @@ public class DiceServiceImpl implements DiceService{
 
     @Override
     public DiceRoll playTurn(DiceGame game, Account player) {
-        int first = roll();
-        int second = roll();
-        Integer third = isFirstDiceEven(first) ? roll() : null;
+        // 한 턴당 한 번만 주사위 굴리기
+        int value = roll();
+        DiceRoll roll = new DiceRoll(value);
 
-        DiceRoll diceRoll = new DiceRoll(first, second, third);
-
-        // Game 엔티티에 턴 결과 추가
-        game.addRoll(diceRoll);
-        // 변경된 Game을 저장소에 업데이트
+        // 기록 추가 및 점수 누적
+        game.addRoll(player, roll);
+        game.updateScore(player, roll);
         gameRepo.save(game);
-
-        return diceRoll;
+        return roll;
     }
 
     @Override
@@ -55,7 +53,15 @@ public class DiceServiceImpl implements DiceService{
 
     @Override
     public List<DiceRoll> getAllRolls(DiceGame game) {
-        return game.getRolls();
+        return game.getRolls().values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String evaluateRound(DiceGame game) {
+        // 엔티티에 있는 applyThirdRoundSkill()만 호출
+        return game.applyThirdRoundSkill();
     }
 
     private int roll() {
