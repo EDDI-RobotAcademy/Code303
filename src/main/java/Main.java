@@ -2,9 +2,11 @@ import Utility.ConsoleUI;
 
 import java.util.Scanner;
 
-public class Main {
-    // 게임 중단 조건
-    static boolean isGameOver = false;
+import Account.entity.Account;
+import Dice.entity.DiceRoll;
+import Dice.entity.DiceGame;
+import Dice.service.DiceService;
+import Dice.service.DiceServiceImpl;
 
     public static void main(String[] args) {
         // 메뉴 흐름 제어용
