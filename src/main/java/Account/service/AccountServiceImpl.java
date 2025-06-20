@@ -29,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
 	private final int PASSWORD_MINIMUM_LENGTH = 4;
 
 	@Override
-	public int register() {
+	public boolean register() {
 		System.out.println("회원 가입을 진행합니다.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -77,16 +77,17 @@ public class AccountServiceImpl implements AccountService {
 
 			//회원 저장하기
 			Account account = new Account(userId, password);
-			return accountRepository.save(account);
+			accountRepository.save(account);
+			return false;
 
 		}catch(IOException e) {
 			System.out.println("입력 중 오류가 발생했습니다: " + e.getMessage());
-			return -1; // 실패 코드
+			return false; // 실패 코드
 		}
 	}
 
 	@Override
-	public int signIn() {
+	public boolean signIn() {
 		System.out.println("로그인을 진행합니다.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -103,6 +104,7 @@ public class AccountServiceImpl implements AccountService {
 					Account account = maybeAccount.get();
 					if(account.getPassword().equals(password)) {
 						System.out.println("로그인 성공");
+						System.out.println(account.getId());
 						return (int) account.getId();
 					}
 				}

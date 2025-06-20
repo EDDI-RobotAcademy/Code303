@@ -1,6 +1,6 @@
 package Account.service;
 
 public interface AccountService {
-	int register();
-	int signIn();
+	boolean register();
+	boolean signIn();
 }

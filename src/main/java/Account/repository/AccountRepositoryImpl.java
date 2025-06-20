@@ -24,11 +24,11 @@ public class AccountRepositoryImpl implements AccountRepository{
 	private static final Map<Integer, Account> accountHashMap = new HashMap<>();
 
 	@Override
-	public int save(Account account) {
-		System.out.println("계정 정보를 저장하시겠습니까?" + account);
+	public void save(Account account) {
+		System.out.println("계정 정보를 저장합니다");
 		int accountUniqueId = (int) account.getId();
 		accountHashMap.put(accountUniqueId, account);
-		return accountUniqueId;
+//		return accountUniqueId;
 	}
 
 	@Override

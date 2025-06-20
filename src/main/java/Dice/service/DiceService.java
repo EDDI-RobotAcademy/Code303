@@ -14,4 +14,6 @@ public interface DiceService {
 
 
     String evaluateRound(DiceGame game);
+
+    void startMenu();
 }
