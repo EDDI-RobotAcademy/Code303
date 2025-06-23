@@ -1,19 +1,24 @@
 package Dice.service;
 
 import Account.entity.Account;
+import Account.service.AccountServiceImpl;
 import Dice.entity.DiceGame;
 import Dice.entity.DiceRoll;
 import Dice.repository.DiceRepository;
 import Dice.repository.DiceRepositoryImpl;
 import Utility.InputStream;
 import consoleui.entity.ConsoleUiMessage;
+import consoleui.entity.UIActionResult;
 import consoleui.repository.ConsoleUiRepository;
 import consoleui.repository.ConsoleUiRepositoryImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static consoleui.entity.ConsoleUiMessage.SIGNIN;
 
 public class DiceServiceImpl implements DiceService {
     private static DiceServiceImpl instance;
@@ -38,13 +43,7 @@ public class DiceServiceImpl implements DiceService {
     private final int minDice = 1;
     private final int maxDice = 6;
 
-    @Override
-    public DiceGame startGame(Account p1, Account p2) {
-        DiceGame dicegame = new DiceGame(gameCounter++, p1, p2);
-        // 변경 이전: gameRepo.save(game);
-        diceRepository.save(dicegame); // DiceRepository 사용으로 변경
-        return dicegame;
-    }
+
 
     @Override
     public DiceRoll playTurn(DiceGame game, Account player) {
@@ -81,27 +80,87 @@ public class DiceServiceImpl implements DiceService {
     }
 
     @Override
+    public DiceGame startGame(Account p1, Account p2) {
+        DiceGame dicegame = new DiceGame(gameCounter++, p1, p2);
+        // 변경 이전: gameRepo.save(game);
+        diceRepository.save(dicegame); // DiceRepository 사용으로 변경
+        return dicegame;
+    }
+
+    @Override
     public void startMenu() {
-        // 신규 메서드: 콘솔 UI 시작 메뉴 출력 기능 추가
-        //맨처음 환영문구 출력
+        consoleUiRepository.displayWelcomeMessage();
+        AccountServiceImpl accountServiceImpl = AccountServiceImpl.getInstance();
+        DiceService diceService = DiceServiceImpl.getInstance();
+
+        // 1) 두 플레이어 리스트 준비
+        List<Account> players = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            System.out.printf("== %d번 플레이어: 회원가입 → 로그인 ==%n", i);
+            performUntilSuccess(ConsoleUiMessage.SIGNUP);
+            performUntilSuccess(ConsoleUiMessage.SIGNIN);
+            // 로그인 성공한 Account 객체 취득
+            players.add(accountServiceImpl.getCurrentUser());
+        }
+
+        // 2) 두 플레이어로 게임 시작
+        Account p1 = players.get(0), p2 = players.get(1);
+        diceService.startGame(p1, p2);
+    }
+
+    private void performUntilSuccess(ConsoleUiMessage expected) {
+        UIActionResult result = UIActionResult.FAILURE;//초기 값 부여
+        do {
+            consoleUiRepository.displayInitialMessage();
+            String input = InputStream.getStringInput("입력: ").trim();
+            ConsoleUiMessage msg = ConsoleUiMessage.fromUserInput(input);
+
+            // 사용자가 정확한 메뉴를 선택했는지 먼저 검사
+            if (msg != expected) {
+                consoleUiRepository.displayErrorMessage();
+                continue;
+            }
+
+            // 실제 액션 실행
+            result = consoleUiRepository.displayMessageFromUserInput(msg);
+            if (result == UIActionResult.FAILURE) {
+                consoleUiRepository.displayErrorMessage();
+            }
+        } while (result != UIActionResult.SUCCESS);
+    }
+}
+/*
+    @Override
+    public void startMenu() {
         consoleUiRepository.displayWelcomeMessage();
         while (true) {
-            //이후 사용자로부터 값입력받는 콘솔 출력
-            consoleUiRepository.displayInitialMessage();
-            //이제 사용자로부터 값을 받아오는거 구현
-            String userInput = InputStream.getStringInput("입력: ");
-            //받아온 값을 기준으로 enum형식으로 연동
-            // 사용자가 입력한 문자열을 enum으로 변환
-            ConsoleUiMessage selectedMessage = ConsoleUiMessage.fromUserInput(userInput);
-            // 변환된 enum 값을 전달해 UI 출력 로직 호출
-            //리턴값이 2(로그인이 되면 리턴값)가 나오면 showGameMenu쪽으로 처리
-            int result=consoleUiRepository.displayMessageFromUserInput(selectedMessage);
-            if(result==2){
-                consoleUiRepository.displayshowGameMenu()
+            consoleUiRepository.displayInitialMessage();//이후 사용자로부터 값입력받는 콘솔 출력
+            String userInput = InputStream.getStringInput("입력: ");//이제 사용자로부터 값을 받아오는거 구현
+            ConsoleUiMessage selectedMessage = ConsoleUiMessage.fromUserInput(userInput);// 사용자가 입력한 문자열을 enum으로 변환
+            UIActionResult result = consoleUiRepository.displayMessageFromUserInput(selectedMessage);
+            switch (result) {
+                case SUCCESS://result return값이 SUCCESS일때
+                    if (selectedMessage == ConsoleUiMessage.SIGNIN) {
+                        consoleUiRepository.showGameMenu();    // 로그인 성공 시 다음 단계
+                    }
+                    break;
+                case FAILURE:
+                    consoleUiRepository.displayErrorMessage();  // 실패 시 재시도 안내
+                    break;
+                case EXIT:
+                    consoleUiRepository.displayExitMessage();
+                    return;  // 프로그램 종료
             }
             // ConsoleUiMessage.SIGNUP
             // ConsoleUiMessage.SIGNIN
             // ConsoleUiMessage.EXIT
+
+//          메뉴콘솔출력
+//          입력값을 받음
+//          문자열을 enum으로변환처리
+//          변환처리된값을 displayMesageFromUserInput을 통해서 결과값 return 받음(UIactionResult)
+//          return된 결과값 result를 기반으로 switch문을 사용해서 처리
+
             //회원가입을 했다는 기준이 뭐야
             //로그인을 했다는 기준을 무엇으로 잡아야하는가
             //로그인했으면 게임하기,기록보기,종료하기를 출력하는 콘솔 출력
@@ -109,5 +168,6 @@ public class DiceServiceImpl implements DiceService {
 
             // 추후: 메뉴 구조 분기 로직 구현 예정
         }
+
     }
-}
+*/

@@ -1,6 +1,9 @@
 package Account.service;
 
+import consoleui.entity.UIActionResult;
+
 public interface AccountService {
-	boolean register();
-	boolean signIn();
+	UIActionResult register();
+
+	UIActionResult signIn();
 }

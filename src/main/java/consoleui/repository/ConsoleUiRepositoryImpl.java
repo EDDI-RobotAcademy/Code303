@@ -2,6 +2,7 @@ package consoleui.repository;
 
 import Account.service.AccountServiceImpl;
 import consoleui.entity.ConsoleUiMessage;
+import consoleui.entity.UIActionResult;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -25,7 +26,8 @@ public class ConsoleUiRepositoryImpl implements ConsoleUiRepository {
 //            = new EnumMap<>(ConsoleUiMessage.class);
     //기존 Runnable은 return을 가져올수가없다.
     //그렇기에 Supplier를 사용해서 처리한다 현재코드는 integer를 기준으로 처리한다
-    private final Map<ConsoleUiMessage, Supplier<Boolean>>actionMap=
+    /*사용할 enum을 Supplier형식으로 연동처리한다*/
+    private final Map<ConsoleUiMessage, Supplier<UIActionResult>>actionMap=
             new EnumMap<>(ConsoleUiMessage.class);
 
     private ConsoleUiRepositoryImpl() {
@@ -34,7 +36,7 @@ public class ConsoleUiRepositoryImpl implements ConsoleUiRepository {
 //      actionMap.put(ConsoleUiMessage.SIGNUP, ()->accountService.register());
         actionMap.put(ConsoleUiMessage.SIGNUP, accountService::register);
         actionMap.put(ConsoleUiMessage.SIGNIN, accountService::signIn);
-        actionMap.put(ConsoleUiMessage.EXIT,   () -> { displayExitMessage(); return 0; });
+        actionMap.put(ConsoleUiMessage.EXIT,   () -> { displayExitMessage(); return UIActionResult.EXIT; });
     }
 
     @Override
@@ -48,13 +50,13 @@ public class ConsoleUiRepositoryImpl implements ConsoleUiRepository {
     }
 
     @Override
-    public boolean displayMessageFromUserInput(ConsoleUiMessage selectedMessage) {
-        Supplier<Boolean> action = actionMap.get(selectedMessage);
+    public UIActionResult displayMessageFromUserInput(ConsoleUiMessage selectedMessage) {
+        Supplier<UIActionResult> action = actionMap.get(selectedMessage);
         if (action != null) {
             return action.get();    // ❗ 반환값을 호출부에 그대로 전달
         }
         System.out.println("알 수 없는 명령입니다.");
-        return false;
+        return UIActionResult.FAILURE;
     }
     //    public void displayMessageFromUserInput(ConsoleUiMessage message) {
 //        Runnable action = actionMap.get(message);  // ①
@@ -69,5 +71,15 @@ public class ConsoleUiRepositoryImpl implements ConsoleUiRepository {
     public void displayExitMessage() {
         System.out.println("게임을 종료합니다");
         System.exit(0);
+    }
+
+    @Override
+    public void showGameMenu() {
+
+    }
+
+    @Override
+    public void displayErrorMessage() {
+
     }
 }
