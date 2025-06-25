@@ -8,12 +8,13 @@ import java.util.Optional;
 import Account.entity.Account;
 import Account.repository.AccountRepository;
 import Account.repository.AccountRepositoryImpl;
+import consoleui.entity.UIActionResult;
 
 public class AccountServiceImpl implements AccountService {
 	private static AccountServiceImpl instance;
 
 	private final AccountRepository accountRepository;
-
+	private Account currentUser;
 	private AccountServiceImpl() {
 		this.accountRepository = AccountRepositoryImpl.getInstance();
 	}
@@ -29,7 +30,8 @@ public class AccountServiceImpl implements AccountService {
 	private final int PASSWORD_MINIMUM_LENGTH = 4;
 
 	@Override
-	public int register() {
+	public UIActionResult register() {
+		Boolean ok = false;
 		System.out.println("회원 가입을 진행합니다.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -77,16 +79,21 @@ public class AccountServiceImpl implements AccountService {
 
 			//회원 저장하기
 			Account account = new Account(userId, password);
-			return accountRepository.save(account);
+			accountRepository.save(account);
+			return UIActionResult.SUCCESS;
 
 		}catch(IOException e) {
 			System.out.println("입력 중 오류가 발생했습니다: " + e.getMessage());
-			return -1; // 실패 코드
+			return UIActionResult.FAILURE;
 		}
+			 // 실패 코드
+//		}finally {
+//			return ok? UIActionResult.SUCCESS : UIActionResult.FAILURE;
+//		}
 	}
 
 	@Override
-	public int signIn() {
+	public UIActionResult signIn() {
 		System.out.println("로그인을 진행합니다.");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -102,8 +109,10 @@ public class AccountServiceImpl implements AccountService {
 				if(maybeAccount.isPresent()) {
 					Account account = maybeAccount.get();
 					if(account.getPassword().equals(password)) {
+						this.currentUser = account;
 						System.out.println("로그인 성공");
-						return (int) account.getId();
+						System.out.println(account.getId());
+						return UIActionResult.SUCCESS;
 					}
 				}
 
@@ -111,8 +120,12 @@ public class AccountServiceImpl implements AccountService {
 
 			}catch(IOException e) {
 				System.out.println("입력 중 오류가 발생했습니다: " + e.getMessage());
-				return -1;
+				return UIActionResult.FAILURE;
 			}
 		}
+	}
+
+	public Account getCurrentUser() {
+		return currentUser;
 	}
 }
